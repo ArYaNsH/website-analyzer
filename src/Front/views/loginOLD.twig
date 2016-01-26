@@ -1,0 +1,11 @@
+{% block stylesheets %}
+	<link href="{{ app.request.baseurl }}/web/front/css/stylesheet.css" type="text/css" rel="stylesheet" />
+{% endblock %}
+
+<title>Login</title>
+
+<div class="form-control">
+	Email: <input type="text"><br>
+	Password: <input type="text"><br>
+	<a href="{{ path('homepage') }}"><h1>Back to homepage</h1></a>
+</div>

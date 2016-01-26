@@ -1,0 +1,15 @@
+{% block stylesheets %}
+	<link href="{{ app.request.baseurl }}/web/front/css/stylesheet.css" type="text/css" rel="stylesheet" />
+{% endblock %}
+
+<title>Register</title>
+<div class="form-control">
+	<h1>Register Yourself!</h1>
+	<form action="{{ path('register') }}" method="post" novalidate>
+		{{ form_widget(form) }}
+
+		<input type="submit" name="submit" />
+		</br>
+		<a id="back" href="{{ path('homepage') }}"><h1>Back to homepage</h1></a>
+	</form>
+</div>

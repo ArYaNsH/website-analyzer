@@ -1,0 +1,15 @@
+{% extends "base.twig" %}
+
+{% block content %}
+	<div id="content1">
+				
+		<h1 class="brand-name">Insert your URL here:</h1>
+		<form action="{{ path('homepage') }}" method="POST">
+			
+			{{ form_widget(form) }}
+
+		</form>
+		
+		
+	</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    {% if metas is defined and metas is not empty %}
+        <title>{{ metas.metaTitle }}</title>
+        <meta property="dc:title" content="{{ metas.metaTitle }}">
+        <meta content="{{ metas.metaDesc }}" name="description">
+        <meta name="keywords" content="{{ metas.keyWords }}">    
+    {% else %}
+        <title>Web Analyzer & Optimizer</title>
+    {% endif %}
+
+    {{ render(url('front.css')) }}
+    {{ render(url('front.js')) }}
+
+    {% block scripts %} {% endblock %}
+</head>
+<body class="home">
+    <div id="page"> 
+    <div class="container">
+        
+        
+        <!-- ______________________ MAIN _______________________ -->
+        <div id="main" class="clearfix">
+            <div id="content">
+            <div id="content-inner" class="inner column center">
+                <div id="content-area">
+                    {% block content %} {% endblock %}
+                </div><!-- /#content-area -->
+            </div> <!-- /content-inner--> 
+            </div><!-- /content-->
+        </div><!-- /main --> 
+        
+    </div>
+    
+    {% block closure %} {% endblock %}
+    </div>
+</html>	
