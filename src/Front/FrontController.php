@@ -130,6 +130,20 @@ class FrontController {
             
 
             //------------------capture js file-----------------------//
+            $scripts = array();
+            $selector = '//script[contains(@src, "")]';
+            $jsTag = $xpath->query($selector);
+
+
+            foreach ($jsTag as $key) {
+                    
+                array_push($scripts, rel2abs($key->getAttribute('src'), $target));
+            }
+            foreach ($scripts as $script => $value) {
+                $path = realpath(__DIR__ . '/../../');
+                $jsFile = $path . '/files/DownloadedJs/' . basename($value);
+                file_put_contents($jsFile, file_get_contents($value));
+            }
             
 
             //------------------capture all html files-----------------------//
