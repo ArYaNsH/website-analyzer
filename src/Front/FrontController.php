@@ -28,7 +28,6 @@ class FrontController {
             $data = $form->getData();
             $target = $data['url'];
 
-            //$target = "http://www.ymc.ch/en/webscraping-in-php-with-guzzle-http-and-symfony-domcrawler";
             $page = new HttpCurl();
             $page->get($target);
             /*echo " Web Page Header<br>";
@@ -43,47 +42,54 @@ class FrontController {
             //function to convert relative url to absolute
             function rel2abs( $rel, $base ) {
 
-            // parse base URL  and convert to local variables: $scheme, $host,  $path
-            extract( parse_url( $base ) );
+                // parse base URL  and convert to local variables: $scheme, $host,  $path
+                extract( parse_url( $base ) );
 
-            if ( strpos( $rel,"//" ) === 0 ) {
-                return $scheme . ':' . $rel;
+                if ( strpos( $rel,"//" ) === 0 ) {
+                    return $scheme . ':' . $rel;
+                }
+
+                // return if already absolute URL
+                if ( parse_url( $rel, PHP_URL_SCHEME ) != '' ) {
+                    return $rel;
+                }
+
+                // queries and anchors
+                if ( $rel[0] == '#' || $rel[0] == '?' ) {
+                    return $base . $rel;
+                }
+
+                // remove non-directory element from path
+                $path = preg_replace( '#/[^/]*$#', '', $path );
+
+                // destroy path if relative url points to root
+                if ( $rel[0] ==  '/' ) {
+                    $path = '';
+                }
+
+                // dirty absolute URL
+                $abs = $host . $path . "/" . $rel;
+
+                // replace '//' or  '/./' or '/foo/../' with '/'
+                $abs = preg_replace( "/(\/\.?\/)/", "/", $abs );
+                $abs = preg_replace( "/\/(?!\.\.)[^\/]+\/\.\.\//", "/", $abs );
+
+                // absolute URL is ready!
+                return $scheme . '://' . $abs;
             }
 
-            // return if already absolute URL
-            if ( parse_url( $rel, PHP_URL_SCHEME ) != '' ) {
-                return $rel;
-            }
-
-            // queries and anchors
-            if ( $rel[0] == '#' || $rel[0] == '?' ) {
-                return $base . $rel;
-            }
-
-            // remove non-directory element from path
-            $path = preg_replace( '#/[^/]*$#', '', $path );
-
-            // destroy path if relative url points to root
-            if ( $rel[0] ==  '/' ) {
-                $path = '';
-            }
-
-            // dirty absolute URL
-            $abs = $host . $path . "/" . $rel;
-
-            // replace '//' or  '/./' or '/foo/../' with '/'
-            $abs = preg_replace( "/(\/\.?\/)/", "/", $abs );
-            $abs = preg_replace( "/\/(?!\.\.)[^\/]+\/\.\.\//", "/", $abs );
-
-            // absolute URL is ready!
-            return $scheme . '://' . $abs;
-            }
 
             //exploding contents of web page
             $dom = new DOMdocument;
             @$dom->loadHTML($htmlContent);
             $dom->preserveWhiteSpace = false;
             $xpath = new DOMXpath($dom);
+            
+
+
+
+            //------------------capture image-----------------------//
+
             //define which selector to extract
             $selector = '//img';
             $tags = $xpath->query($selector);
@@ -96,9 +102,6 @@ class FrontController {
                 $images[] = rel2abs($src, $target);
             }
 
-
-
-            //------------------capture image-----------------------//
             foreach ($images as $key) {
                 $url = $key;
                 $path = realpath(__DIR__ . '/../../');
@@ -108,6 +111,22 @@ class FrontController {
             
 
             //------------------capture css file-----------------------//
+            $styleSheets = array();
+
+            $selector = '//link[contains(@rel, "stylesheet")]';
+            $cssTag = $xpath->query($selector);
+            
+
+            foreach ($cssTag as $tag) {
+                //array('stylesheet' => $tag->getAttribute('href'));
+                array_push($styleSheets, rel2abs($tag->getAttribute('href'), $target));
+            }
+
+            foreach ($styleSheets as $key => $value) {
+                $path = realpath(__DIR__ . '/../../');
+                $stylesheetFile = $path . '/files/DownloadedCss/' . basename($value);
+                file_put_contents($stylesheetFile, file_get_contents($value));
+            }
             
 
             //------------------capture js file-----------------------//
